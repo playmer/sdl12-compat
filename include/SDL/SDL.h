@@ -26,6 +26,10 @@ real SDL-1.2 available to you. */
 #ifndef _SDL_H
 #define _SDL_H
 
+#ifndef __SDL12_COMPAT_STATIC__
+#include "SDL_compat.h"
+#endif
+
 #include "SDL_main.h"
 #include "SDL_stdinc.h"
 #include "SDL_audio.h"
