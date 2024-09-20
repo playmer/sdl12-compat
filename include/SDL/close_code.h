@@ -31,6 +31,8 @@ real SDL-1.2 available to you. */
 #undef _begin_code_h
 
 
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+
 #ifndef HAVE_ICONV
 #undef SDL_iconv_t
 #define SDL_iconv_t SDL_COMPAT_SDL_iconv_t
@@ -235,6 +237,8 @@ real SDL-1.2 available to you. */
 #ifndef HAVE_VSNPRINTF
 #undef SDL_vsnprintf
 #define SDL_vsnprintf SDL_COMPAT_SDL_vsnprintf
+#endif
+
 #endif
 
 /* Reset structure packing at previous byte alignment */
