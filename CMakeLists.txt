@@ -10,6 +10,7 @@ project(sdl12_compat
 option(SDL12TESTS "Enable to build SDL-1.2 test programs" ON)
 option(SDL12DEVEL "Enable installing SDL-1.2 development headers" ON)
 option(STATICDEVEL "Enable installing static link library" OFF)
+option(SDL12_FULLY_STATIC "Make SDL12_compat capable of being statically compiled alongside SDL2" OFF)
 
 if(STATICDEVEL AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
   message(FATAL_ERROR "Static builds are only supported on Linux.")
@@ -52,7 +53,14 @@ set(SDL12COMPAT_SRCS
 )
 add_library(SDL SHARED ${SDL12COMPAT_SRCS})
 
-find_package(SDL2)
+if (SDL12_FULLY_STATIC)
+  target_compile_definitions(SDL PRIVATE __SDL12_COMPAT_FULLY_STATIC__)
+endif()
+
+if(NOT SDL2_INCLUDE_DIRS)
+  find_package(SDL2)
+endif()
+
 if(NOT SDL2_INCLUDE_DIRS)
   message(FATAL_ERROR "Could not find SDL2 headers")
 endif()

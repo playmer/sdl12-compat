@@ -32,6 +32,10 @@ real SDL-1.2 available to you. */
 #endif
 #endif
 
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+#include "SDL_compat.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

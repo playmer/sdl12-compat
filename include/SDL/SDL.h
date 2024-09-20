@@ -26,7 +26,7 @@ real SDL-1.2 available to you. */
 #ifndef _SDL_H
 #define _SDL_H
 
-#ifndef __SDL12_COMPAT_STATIC__
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
 #include "SDL_compat.h"
 #endif
 
