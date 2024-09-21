@@ -28,6 +28,54 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 #include "../include/SDL/SDL_compat.h"
+
+#define SDL_malloc SDL_COMPAT_SDL_malloc
+#define SDL_calloc SDL_COMPAT_SDL_calloc
+#define SDL_realloc SDL_COMPAT_SDL_realloc
+#define SDL_free SDL_COMPAT_SDL_free
+#define SDL_getenv SDL_COMPAT_SDL_getenv
+#define SDL_qsort SDL_COMPAT_SDL_qsort
+#define SDL_memset SDL_COMPAT_SDL_memset
+#define SDL_memcpy SDL_COMPAT_SDL_memcpy
+#define SDL_memcmp SDL_COMPAT_SDL_memcmp
+#define SDL_strlen SDL_COMPAT_SDL_strlen
+#define SDL_strlcpy SDL_COMPAT_SDL_strlcpy
+#define SDL_strlcat SDL_COMPAT_SDL_strlcat
+#define SDL_strdup SDL_COMPAT_SDL_strdup
+#define SDL_strrev SDL_COMPAT_SDL_strrev
+#define SDL_strupr SDL_COMPAT_SDL_strupr
+#define SDL_strlwr SDL_COMPAT_SDL_strlwr
+#define SDL_strchr SDL_COMPAT_SDL_strchr
+#define SDL_strrchr SDL_COMPAT_SDL_strrchr
+#define SDL_strstr SDL_COMPAT_SDL_strstr
+#define SDL_ltoa SDL_COMPAT_SDL_ltoa
+#define SDL_ultoa SDL_COMPAT_SDL_ultoa
+#define SDL_strtol SDL_COMPAT_SDL_strtol
+#define SDL_strtoul SDL_COMPAT_SDL_strtoul
+#define SDL_lltoa SDL_COMPAT_SDL_lltoa
+#define SDL_ulltoa SDL_COMPAT_SDL_ulltoa
+#define SDL_strtoll SDL_COMPAT_SDL_strtoll
+#define SDL_strtoull SDL_COMPAT_SDL_strtoull
+#define SDL_strtod SDL_COMPAT_SDL_strtod
+#define SDL_strcmp SDL_COMPAT_SDL_strcmp
+#define SDL_strncmp SDL_COMPAT_SDL_strncmp
+#define SDL_strcasecmp SDL_COMPAT_SDL_strcasecmp
+#define SDL_strncasecmp SDL_COMPAT_SDL_strncasecmp
+#define SDL_vsnprintf SDL_COMPAT_SDL_vsnprintf
+#define SDL_iconv_open SDL_COMPAT_SDL_iconv_open
+#define SDL_iconv_close SDL_COMPAT_SDL_iconv_close
+#define SDL_sscanf SDL_COMPAT_SDL_sscanf
+#define SDL_snprintf SDL_COMPAT_SDL_snprintf
+#define SDL_revcpy SDL_COMPAT_SDL_revcpy
+#define SDL_PollEvent_locked SDL_COMPAT_SDL_PollEvent_locked
+#define SDL_PushEvent_locked SDL_COMPAT_SDL_PushEvent_locked
+#define SDL_PeepEvents_locked SDL_COMPAT_SDL_PeepEvents_locked
+#define SDL_putenv SDL_COMPAT_SDL_putenv
+#define SDL_GL_DisableContext SDL_COMPAT_SDL_GL_DisableContext
+#define SDL_GL_EnableContext_Thread SDL_COMPAT_SDL_GL_EnableContext_Thread
+
+
+
 #else
 #include "SDL20_include_wrapper.h"
 #endif
