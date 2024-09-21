@@ -20,10 +20,13 @@
 */
 
 /* This file contains functions for backwards compatibility with SDL 1.2 */
-
 #ifdef __SDL12_COMPAT_FULLY_STATIC__
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_syswm.h"
+#ifdef NXDK
+#define SDL_DISABLE_ANALYZE_MACROS
+#undef _WIN32
+#endif
+#include "SDL.h"
+#include "SDL_syswm.h"
 #include "../include/SDL/SDL_compat.h"
 #else
 #include "SDL20_include_wrapper.h"
