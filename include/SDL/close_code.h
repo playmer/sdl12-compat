@@ -33,210 +33,198 @@ real SDL-1.2 available to you. */
 
 #ifdef __SDL12_COMPAT_FULLY_STATIC__
 
-#ifndef HAVE_ICONV
+#ifdef HAVE_ICONV
 #undef SDL_iconv_t
-#define SDL_iconv_t SDL_COMPAT_SDL_iconv_t
+#define SDL_COMPAT_SDL_iconv_t iconv_t
 #undef SDL_iconv_open
-#define SDL_iconv_open SDL_COMPAT_SDL_iconv_open
+#define SDL_COMPAT_SDL_iconv_open iconv_open
 #undef SDL_iconv_close
-#define SDL_iconv_close SDL_COMPAT_SDL_iconv_close
+#define SDL_COMPAT_SDL_iconv_close iconv_close
 #endif
 
-#ifndef HAVE_MALLOC
+#ifdef HAVE_MALLOC
 #undef SDL_malloc
-#define SDL_malloc SDL_COMPAT_SDL_malloc
+#define SDL_COMPAT_SDL_malloc malloc
 #endif
 
-#ifndef HAVE_CALLOC
+#ifdef HAVE_CALLOC
 #undef SDL_calloc
-#define SDL_calloc SDL_COMPAT_SDL_calloc
+#define SDL_COMPAT_SDL_calloc calloc
 #endif
 
-#ifndef HAVE_REALLOC
+#ifdef HAVE_REALLOC
 #undef SDL_realloc
-#define SDL_realloc SDL_COMPAT_SDL_realloc
+#define SDL_COMPAT_SDL_realloc realloc
 #endif
 
-#ifndef HAVE_FREE
+#ifdef HAVE_FREE
 #undef SDL_free
-#define SDL_free SDL_COMPAT_SDL_free
+#define SDL_COMPAT_SDL_free free
 #endif
 
-#ifndef HAVE_GETENV
+#ifdef HAVE_GETENV
 #undef SDL_getenv
-#define SDL_getenv SDL_COMPAT_SDL_getenv
+#define SDL_COMPAT_SDL_getenv getenv
 #endif
 
-#ifndef HAVE_PUTENV
+#ifdef HAVE_PUTENV
 #undef SDL_putenv
-#define SDL_putenv SDL_COMPAT_SDL_putenv
+#define SDL_COMPAT_SDL_putenv putenv
 #endif
 
-#ifndef HAVE_QSORT
+#ifdef HAVE_QSORT
 #undef SDL_qsort
-#define SDL_qsort SDL_COMPAT_SDL_qsort
+#define SDL_COMPAT_SDL_qsort qsort
 #endif
 
-#ifndef HAVE_MEMSET
+#ifdef HAVE_MEMSET
 #undef SDL_memset
-#define SDL_memset SDL_COMPAT_SDL_memset
+#define SDL_COMPAT_SDL_memset memset
 #endif
 
-#ifndef HAVE_MEMCPY
+#ifdef HAVE_MEMCPY
 #undef SDL_memcpy
-#define SDL_memcpy SDL_COMPAT_SDL_memcpy
+#define SDL_COMPAT_SDL_memcpy memcpy
 #endif
 
-#ifndef HAVE_REVCPY
+#ifdef HAVE_REVCPY
 #undef SDL_revcpy
-#define SDL_revcpy SDL_COMPAT_SDL_revcpy
+#define SDL_COMPAT_SDL_revcpy revcpy
 #endif
 
-#ifndef HAVE_MEMCMP
+#ifdef HAVE_MEMCMP
 #undef SDL_memcmp
-#define SDL_memcmp SDL_COMPAT_SDL_memcmp
+#define SDL_COMPAT_SDL_memcmp memcmp
 #endif
 
-#ifndef HAVE_STRLEN
+#ifdef HAVE_STRLEN
 #undef SDL_strlen
-#define SDL_strlen SDL_COMPAT_SDL_strlen
+#define SDL_COMPAT_SDL_strlen strlen
 #endif
 
-#ifndef HAVE_STRLCPY
+#ifdef HAVE_STRLCPY
 #undef SDL_strlcpy
-#define SDL_strlcpy SDL_COMPAT_SDL_strlcpy
+#define SDL_COMPAT_SDL_strlcpy strlcpy
 #endif
 
-#ifndef HAVE_STRLCAT
+#ifdef HAVE_STRLCAT
 #undef SDL_strlcat
-#define SDL_strlcat SDL_COMPAT_SDL_strlcat
+#define SDL_COMPAT_SDL_strlcat strlcat
 #endif
 
-#ifndef HAVE_STRDUP
+#ifdef HAVE_STRDUP
 #undef SDL_strdup
-#define SDL_strdup SDL_COMPAT_SDL_strdup
+#define SDL_COMPAT_SDL_strdup strdup
 #endif
 
-#ifndef HAVE__STRREV
+#ifdef HAVE__STRREV
 #undef SDL_strrev
-#define SDL_strrev SDL_COMPAT_SDL_strrev
+#define SDL_COMPAT_SDL_strrev _strrev
 #endif
 
-#ifndef HAVE__STRUPR
+#ifdef HAVE__STRUPR
 #undef SDL_strupr
-#define SDL_strupr SDL_COMPAT_SDL_strupr
+#define SDL_COMPAT_SDL_strupr _strupr
 #endif
 
-#ifndef HAVE__STRLWR
+#ifdef HAVE__STRLWR
 #undef SDL_strlwr
-#define SDL_strlwr SDL_COMPAT_SDL_strlwr
+#define SDL_COMPAT_SDL_strlwr _strlwr
 #endif
 
-#ifndef HAVE_STRCHR
+#ifdef HAVE_STRCHR
 #undef SDL_strchr
-#define SDL_strchr SDL_COMPAT_SDL_strchr
+#define SDL_COMPAT_SDL_strchr strchr
 #endif
 
-#ifndef HAVE_STRRCHR
+#ifdef HAVE_STRRCHR
 #undef SDL_strrchr
-#define SDL_strrchr SDL_COMPAT_SDL_strrchr
+#define SDL_COMPAT_SDL_strrchr strrchr
 #endif
 
-#ifndef HAVE_STRSTR
+#ifdef HAVE_STRSTR
 #undef SDL_strstr
-#define SDL_strstr SDL_COMPAT_SDL_strstr
+#define SDL_COMPAT_SDL_strstr strstr
 #endif
 
-#ifndef HAVE__LTOA
+#ifdef HAVE__LTOA
 #undef SDL_ltoa
-#define SDL_ltoa SDL_COMPAT_SDL_ltoa
+#define SDL_COMPAT_SDL_ltoa _ltoa
 #endif
 
-#ifndef HAVE__ULTOA
+#ifdef HAVE__ULTOA
 #undef SDL_ultoa
-#define SDL_ultoa SDL_COMPAT_SDL_ultoa
+#define SDL_COMPAT_SDL_ultoa _ultoa
 #endif
 
-#ifndef HAVE_STRTOL
+#ifdef HAVE_STRTOL
 #undef SDL_strtol
-#define SDL_strtol SDL_COMPAT_SDL_strtol
+#define SDL_COMPAT_SDL_strtol strtol
 #endif
 
-#ifndef HAVE_STRTOUL
+#ifdef HAVE_STRTOUL
 #undef SDL_strtoul
-#define SDL_strtoul SDL_COMPAT_SDL_strtoul
+#define SDL_COMPAT_SDL_strtoul strtoul
 #endif
 
-#ifndef HAVE__I64TOA
+#ifdef HAVE__I64TOA
 #undef SDL_lltoa
-#define SDL_lltoa SDL_COMPAT_SDL_lltoa
+#define SDL_COMPAT_SDL_lltoa _i64toa
 #endif
 
-#ifndef HAVE__UI64TOA
+#ifdef HAVE__UI64TOA
 #undef SDL_ulltoa
-#define SDL_ulltoa SDL_COMPAT_SDL_ulltoa
+#define SDL_COMPAT_SDL_ulltoa _ui64toa
 #endif
 
-#ifndef HAVE__STRTOI64
+#ifdef HAVE__STRTOI64
 #undef SDL_strtoll
-#define SDL_strtoll SDL_COMPAT_SDL_strtoll
-#elif !defined(HAVE_STRTOLL)
-#undef SDL_strtoll
-#define SDL_strtoll SDL_COMPAT_SDL_strtoll
+#define SDL_COMPAT_SDL_strtoll _strtoi64
 #endif
 
-#ifndef HAVE__STRTOUI64
+#ifdef HAVE__STRTOUI64
 #undef SDL_strtoull
-#define SDL_strtoull SDL_COMPAT_SDL_strtoull
-#elif !defined(HAVE_STRTOULL)
-#undef SDL_strtoull
-#define SDL_strtoull SDL_COMPAT_SDL_strtoull
+#define SDL_COMPAT_SDL_strtoull _strtoui64
 #endif
 
-#ifndef HAVE_STRTOD
+#ifdef HAVE_STRTOD
 #undef SDL_strtod
-#define SDL_strtod SDL_COMPAT_SDL_strtod
+#define SDL_COMPAT_SDL_strtod strtod
 #endif
 
-#ifndef HAVE_STRCMP
+#ifdef HAVE_STRCMP
 #undef SDL_strcmp
-#define SDL_strcmp SDL_COMPAT_SDL_strcmp
+#define SDL_COMPAT_SDL_strcmp strcmp
 #endif
 
-#ifndef HAVE_STRNCMP
+#ifdef HAVE_STRNCMP
 #undef SDL_strncmp
-#define SDL_strncmp SDL_COMPAT_SDL_strncmp
+#define SDL_COMPAT_SDL_strncmp strncmp
 #endif
 
-#ifndef HAVE_STRCASECMP
+#ifdef HAVE_STRCASECMP
 #undef SDL_strcasecmp
-#define SDL_strcasecmp SDL_COMPAT_SDL_strcasecmp
-#elif !defined(HAVE__STRICMP)
-#undef SDL_strcasecmp
-#define SDL_strcasecmp SDL_COMPAT_SDL_strcasecmp
+#define SDL_COMPAT_SDL_strcasecmp strcasecmp
 #endif
 
-#ifndef HAVE_STRNCASECMP
+#ifdef HAVE_STRNCASECMP
 #undef SDL_strncasecmp
-#define SDL_strncasecmp SDL_COMPAT_SDL_strncasecmp
-#elif !defined(HAVE__STRNICMP)
-#undef SDL_strcasecmp
-#define SDL_strcasecmp SDL_COMPAT_SDL_strcasecmp
+#define SDL_COMPAT_SDL_strncasecmp strncasecmp
 #endif
 
-#ifndef HAVE_SSCANF
+#ifdef HAVE_SSCANF
 #undef SDL_sscanf
-#define SDL_sscanf SDL_COMPAT_SDL_sscanf
+#define SDL_COMPAT_SDL_sscanf sscanf
 #endif
 
-#ifndef HAVE_SNPRINT
+#ifdef HAVE_SNPRINT
 #undef SDL_snprintf
-#define SDL_snprintf SDL_COMPAT_SDL_snprintf
+#define SDL_COMPAT_SDL_snprintf snprintf
 #endif
 
-#ifndef HAVE_VSNPRINTF
+#ifdef HAVE_VSNPRINTF
 #undef SDL_vsnprintf
-#define SDL_vsnprintf SDL_COMPAT_SDL_vsnprintf
+#define SDL_COMPAT_SDL_vsnprintf vsnprintf
 #endif
 
 #endif
