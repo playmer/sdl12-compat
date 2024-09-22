@@ -127,172 +127,296 @@ so things built with these headers will still run against the real SDL 1.2. */
 #define SDL_iconv_close iconv_close
 #else
 typedef struct _SDL_iconv_t *SDL_iconv_t;
-extern DECLSPEC SDL_iconv_t SDLCALL SDL_iconv_open(const char *tocode, const char *fromcode);
-extern DECLSPEC int SDLCALL SDL_iconv_close(SDL_iconv_t cd);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC SDL_iconv_t SDLCALL SDL_iconv_open(const char *tocode, const char *fromcode);
+#else
+  extern DECLSPEC SDL_iconv_t SDLCALL SDL_COMPAT_SDL_iconv_open(const char *tocode, const char *fromcode);
 #endif
-extern DECLSPEC size_t SDLCALL SDL_iconv(SDL_iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
-extern DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf, size_t inbytesleft);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_iconv_close(SDL_iconv_t cd);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_iconv_close(SDL_iconv_t cd);
+#endif
+#endif
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC size_t SDLCALL SDL_iconv(SDL_iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
+#else
+  extern DECLSPEC size_t SDLCALL SDL_COMPAT_SDL_iconv(SDL_iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
+#endif
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf, size_t inbytesleft);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf, size_t inbytesleft);
+#endif
 
 #ifdef HAVE_MALLOC
 #define SDL_malloc malloc
 #else
-extern DECLSPEC void * SDLCALL SDL_malloc(size_t size);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_malloc(size_t size);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_malloc(size_t size);
+#endif
 #endif
 
 #ifdef HAVE_CALLOC
 #define SDL_calloc calloc
 #else
-extern DECLSPEC void * SDLCALL SDL_calloc(size_t nmemb, size_t size);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_calloc(size_t nmemb, size_t size);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_calloc(size_t nmemb, size_t size);
+#endif
 #endif
 
 #ifdef HAVE_REALLOC
 #define SDL_realloc realloc
 #else
-extern DECLSPEC void * SDLCALL SDL_realloc(void *mem, size_t size);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_realloc(void *mem, size_t size);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_realloc(void *mem, size_t size);
+#endif
 #endif
 
 #ifdef HAVE_FREE
 #define SDL_free free
 #else
-extern DECLSPEC void SDLCALL SDL_free(void *mem);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void SDLCALL SDL_free(void *mem);
+#else
+  extern DECLSPEC void SDLCALL SDL_COMPAT_SDL_free(void *mem);
+#endif
 #endif
 
 #ifdef HAVE_GETENV
 #define SDL_getenv getenv
 #else
-extern DECLSPEC char * SDLCALL SDL_getenv(const char *name);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_getenv(const char *name);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_getenv(const char *name);
+#endif
 #endif
 
 #ifdef HAVE_PUTENV
 #define SDL_putenv putenv
 #else
-extern DECLSPEC int SDLCALL SDL_putenv(const char *variable);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_putenv(const char *variable);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_putenv(const char *variable);
+#endif
 #endif
 
 #ifdef HAVE_QSORT
 #define SDL_qsort qsort
 #else
-extern DECLSPEC void SDLCALL SDL_qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void SDLCALL SDL_qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
+#else
+  extern DECLSPEC void SDLCALL SDL_COMPAT_SDL_qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *));
+#endif
 #endif
 
 #ifdef HAVE_MEMSET
 #define SDL_memset memset
 #else
-extern DECLSPEC void * SDLCALL SDL_memset(void *dst, int c, size_t len);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_memset(void *dst, int c, size_t len);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_memset(void *dst, int c, size_t len);
+#endif
 #endif
 
 #ifdef HAVE_MEMCPY
 #define SDL_memcpy memcpy
 #else
-extern DECLSPEC void * SDLCALL SDL_memcpy(void *dst, const void *src, size_t len);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_memcpy(void *dst, const void *src, size_t len);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_memcpy(void *dst, const void *src, size_t len);
+#endif
 #endif
 
 #ifdef HAVE_REVCPY
 #define SDL_revcpy revcpy
 #else
-extern DECLSPEC void * SDLCALL SDL_revcpy(void *dst, const void *src, size_t len);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC void * SDLCALL SDL_revcpy(void *dst, const void *src, size_t len);
+#else
+  extern DECLSPEC void * SDLCALL SDL_COMPAT_SDL_revcpy(void *dst, const void *src, size_t len);
+#endif
 #endif
 
 #ifdef HAVE_MEMCMP
 #define SDL_memcmp memcmp
 #else
-extern DECLSPEC int SDLCALL SDL_memcmp(const void *s1, const void *s2, size_t len);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_memcmp(const void *s1, const void *s2, size_t len);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_memcmp(const void *s1, const void *s2, size_t len);
+#endif
 #endif
 
 #ifdef HAVE_STRLEN
 #define SDL_strlen strlen
 #else
-extern DECLSPEC size_t SDLCALL SDL_strlen(const char *string);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC size_t SDLCALL SDL_strlen(const char *string);
+#else
+  extern DECLSPEC size_t SDLCALL SDL_COMPAT_SDL_strlen(const char *string);
+#endif
 #endif
 
 #ifdef HAVE_STRLCPY
 #define SDL_strlcpy strlcpy
 #else
-extern DECLSPEC size_t SDLCALL SDL_strlcpy(char *dst, const char *src, size_t maxlen);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC size_t SDLCALL SDL_strlcpy(char *dst, const char *src, size_t maxlen);
+#else
+  extern DECLSPEC size_t SDLCALL SDL_COMPAT_SDL_strlcpy(char *dst, const char *src, size_t maxlen);
+#endif
 #endif
 
 #ifdef HAVE_STRLCAT
 #define SDL_strlcat strlcat
 #else
-extern DECLSPEC size_t SDLCALL SDL_strlcat(char *dst, const char *src, size_t maxlen);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC size_t SDLCALL SDL_strlcat(char *dst, const char *src, size_t maxlen);
+#else
+  extern DECLSPEC size_t SDLCALL SDL_COMPAT_SDL_strlcat(char *dst, const char *src, size_t maxlen);
+#endif
 #endif
 
 #ifdef HAVE_STRDUP
 #define SDL_strdup strdup
 #else
-extern DECLSPEC char * SDLCALL SDL_strdup(const char *string);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strdup(const char *string);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strdup(const char *string);
+#endif
 #endif
 
 #ifdef HAVE__STRREV
 #define SDL_strrev _strrev
 #else
-extern DECLSPEC char * SDLCALL SDL_strrev(char *string);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strrev(char *string);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strrev(char *string);
+#endif
 #endif
 
 #ifdef HAVE__STRUPR
 #define SDL_strupr _strupr
 #else
-extern DECLSPEC char * SDLCALL SDL_strupr(char *string);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strupr(char *string);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strupr(char *string);
+#endif
 #endif
 
 #ifdef HAVE__STRLWR
 #define SDL_strlwr _strlwr
 #else
-extern DECLSPEC char * SDLCALL SDL_strlwr(char *string);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strlwr(char *string);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strlwr(char *string);
+#endif
 #endif
 
 #ifdef HAVE_STRCHR
 #define SDL_strchr strchr
 #else
-extern DECLSPEC char * SDLCALL SDL_strchr(const char *string, int c);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strchr(const char *string, int c);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strchr(const char *string, int c);
+#endif
 #endif
 
 #ifdef HAVE_STRRCHR
 #define SDL_strrchr strrchr
 #else
-extern DECLSPEC char * SDLCALL SDL_strrchr(const char *string, int c);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strrchr(const char *string, int c);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strrchr(const char *string, int c);
+#endif
 #endif
 
 #ifdef HAVE_STRSTR
 #define SDL_strstr strstr
 #else
-extern DECLSPEC char * SDLCALL SDL_strstr(const char *haystack, const char *needle);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_strstr(const char *haystack, const char *needle);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_strstr(const char *haystack, const char *needle);
+#endif
 #endif
 
 #ifdef HAVE__LTOA
 #define SDL_ltoa _ltoa
 #else
-extern DECLSPEC char * SDLCALL SDL_ltoa(long value, char *string, int radix);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_ltoa(long value, char *string, int radix);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_ltoa(long value, char *string, int radix);
+#endif
 #endif
 
 #ifdef HAVE__ULTOA
 #define SDL_ultoa _ultoa
 #else
-extern DECLSPEC char * SDLCALL SDL_ultoa(unsigned long value, char *string, int radix);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char * SDLCALL SDL_ultoa(unsigned long value, char *string, int radix);
+#else
+  extern DECLSPEC char * SDLCALL SDL_COMPAT_SDL_ultoa(unsigned long value, char *string, int radix);
+#endif
 #endif
 
 #ifdef HAVE_STRTOL
 #define SDL_strtol strtol
 #else
-extern DECLSPEC long SDLCALL SDL_strtol(const char *string, char **endp, int base);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC long SDLCALL SDL_strtol(const char *string, char **endp, int base);
+#else
+  extern DECLSPEC long SDLCALL SDL_COMPAT_SDL_strtol(const char *string, char **endp, int base);
+#endif
 #endif
 
 #ifdef HAVE_STRTOUL
 #define SDL_strtoul strtoul
 #else
-extern DECLSPEC unsigned long SDLCALL SDL_strtoul(const char *string, char **endp, int base);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC unsigned long SDLCALL SDL_strtoul(const char *string, char **endp, int base);
+#else
+  extern DECLSPEC unsigned long SDLCALL SDL_COMPAT_SDL_strtoul(const char *string, char **endp, int base);
+#endif
 #endif
 
 #ifdef HAVE__I64TOA
 #define SDL_lltoa _i64toa
 #else
-extern DECLSPEC char* SDLCALL SDL_lltoa(Sint64 value, char *string, int radix);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char* SDLCALL SDL_lltoa(Sint64 value, char *string, int radix);
+#else
+  extern DECLSPEC char* SDLCALL SDL_COMPAT_SDL_lltoa(Sint64 value, char *string, int radix);
+#endif
 #endif
 
 #ifdef HAVE__UI64TOA
 #define SDL_ulltoa _ui64toa
 #else
-extern DECLSPEC char* SDLCALL SDL_ulltoa(Uint64 value, char *string, int radix);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC char* SDLCALL SDL_ulltoa(Uint64 value, char *string, int radix);
+#else
+  extern DECLSPEC char* SDLCALL SDL_COMPAT_SDL_ulltoa(Uint64 value, char *string, int radix);
+#endif
 #endif
 
 #ifdef HAVE__STRTOI64
@@ -300,7 +424,11 @@ extern DECLSPEC char* SDLCALL SDL_ulltoa(Uint64 value, char *string, int radix);
 #elif defined(HAVE_STRTOLL)
 #define SDL_strtoll strtoll
 #else
-extern DECLSPEC Sint64 SDLCALL SDL_strtoll(const char *string, char **endp, int base);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC Sint64 SDLCALL SDL_strtoll(const char *string, char **endp, int base);
+#else
+  extern DECLSPEC Sint64 SDLCALL SDL_COMPAT_SDL_strtoll(const char *string, char **endp, int base);
+#endif
 #endif
 
 #ifdef HAVE__STRTOUI64
@@ -308,25 +436,41 @@ extern DECLSPEC Sint64 SDLCALL SDL_strtoll(const char *string, char **endp, int 
 #elif defined(HAVE_STRTOULL)
 #define SDL_strtoull strtoull
 #else
-extern DECLSPEC Uint64 SDLCALL SDL_strtoull(const char *string, char **endp, int base);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC Uint64 SDLCALL SDL_strtoull(const char *string, char **endp, int base);
+#else
+  extern DECLSPEC Uint64 SDLCALL SDL_COMPAT_SDL_strtoull(const char *string, char **endp, int base);
+#endif
 #endif
 
 #ifdef HAVE_STRTOD
 #define SDL_strtod strtod
 #else
-extern DECLSPEC double SDLCALL SDL_strtod(const char *string, char **endp);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC double SDLCALL SDL_strtod(const char *string, char **endp);
+#else
+  extern DECLSPEC double SDLCALL SDL_COMPAT_SDL_strtod(const char *string, char **endp);
+#endif
 #endif
 
 #ifdef HAVE_STRCMP
 #define SDL_strcmp strcmp
 #else
-extern DECLSPEC int SDLCALL SDL_strcmp(const char *str1, const char *str2);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_strcmp(const char *str1, const char *str2);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_strcmp(const char *str1, const char *str2);
+#endif
 #endif
 
 #ifdef HAVE_STRNCMP
 #define SDL_strncmp strncmp
 #else
-extern DECLSPEC int SDLCALL SDL_strncmp(const char *str1, const char *str2, size_t maxlen);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_strncmp(const char *str1, const char *str2, size_t maxlen);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_strncmp(const char *str1, const char *str2, size_t maxlen);
+#endif
 #endif
 
 #ifdef HAVE_STRCASECMP
@@ -334,7 +478,11 @@ extern DECLSPEC int SDLCALL SDL_strncmp(const char *str1, const char *str2, size
 #elif defined(HAVE__STRICMP)
 #define SDL_strcasecmp _stricmp
 #else
-extern DECLSPEC int SDLCALL SDL_strcasecmp(const char *str1, const char *str2);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_strcasecmp(const char *str1, const char *str2);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_strcasecmp(const char *str1, const char *str2);
+#endif
 #endif
 
 #ifdef HAVE_STRNCASECMP
@@ -342,25 +490,41 @@ extern DECLSPEC int SDLCALL SDL_strcasecmp(const char *str1, const char *str2);
 #elif defined(HAVE__STRNICMP)
 #define SDL_strcasecmp _strnicmp
 #else
-extern DECLSPEC int SDLCALL SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen);
+#endif
 #endif
 
 #ifdef HAVE_SSCANF
 #define SDL_sscanf sscanf
 #else
-extern DECLSPEC int SDLCALL SDL_sscanf(const char *text, const char *fmt, ...);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_sscanf(const char *text, const char *fmt, ...);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_sscanf(const char *text, const char *fmt, ...);
+#endif
 #endif
 
 #ifdef HAVE_SNPRINT
 #define SDL_snprintf snprintf
 #else
-extern DECLSPEC int SDLCALL SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...);
+#endif
 #endif
 
 #ifdef HAVE_VSNPRINTF
 #define SDL_vsnprintf vsnprintf
 #else
-extern DECLSPEC int SDLCALL SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap);
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
+  extern DECLSPEC int SDLCALL SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap);
+#else
+  extern DECLSPEC int SDLCALL SDL_COMPAT_SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap);
+#endif
 #endif
 
 

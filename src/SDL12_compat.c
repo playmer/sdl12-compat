@@ -20,8 +20,18 @@
 */
 
 /* This file contains functions for backwards compatibility with SDL 1.2 */
-
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+//#ifdef NXDK
+//#define SDL_DISABLE_ANALYZE_MACROS
+//#undef _WIN32
+//#endif
+////#include "SDL.h"
+////#include "SDL_syswm.h"
+////#include "SDL20_compat_begin.h"
+//#include "../include/SDL/SDL_compat.h"
+#else
 #include "SDL20_include_wrapper.h"
+#endif
 
 /*
  * We report the library version as 1.2.$(SDL12_COMPAT_VERSION). This number
@@ -105,17 +115,43 @@ extern "C" {
     typedef rc (SDLCALL *SDL20_##fn##_t) params; \
     static SDL20_##fn##_t SDL20_##fn = IGNORE_THIS_VERSION_OF_SDL_##fn;
 #else
+
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
 #define SDL20_SYM(rc,fn,params,args,ret) \
     typedef rc (SDLCALL *SDL20_##fn##_t) params; \
     static SDL20_##fn##_t SDL20_##fn = NULL;
-#endif
+
 #include "SDL20_syms.h"
+#endif
 
 /* Things that _should_ be binary compatible pass right through... */
+
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
 #define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
     DECLSPEC12 rc SDLCALL SDL_##fn params { ret SDL20_##fn args; }
 #include "SDL20_syms.h"
+#else
+//#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
+//    DECLSPEC12 rc SDLCALL SDL_COMPAT_SDL_##fn params { ret SDL20_##fn args; }
+//#include "SDL20_syms.h"
 
+#define SDL_malloc SDL_COMPAT_SDL_malloc
+#define SDL_free SDL_COMPAT_SDL_free
+#define SDL_strdup SDL_COMPAT_SDL_strdup
+#define SDL_strtoull SDL_COMPAT_SDL_strtoull
+#define SDL_putenv SDL_COMPAT_SDL_putenv
+#endif
+#endif
+
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+#include "SDL20.h"
+
+#ifdef NXDK
+#define SDL_DISABLE_ANALYZE_MACROS
+#undef _WIN32
+#endif
+#include "../include/SDL/SDL_compat.h"
+#endif
 
 /* these are macros (etc) in the SDL headers, so make our own. */
 #define SDL20_OutOfMemory() SDL20_Error(SDL_ENOMEM)
@@ -1207,6 +1243,10 @@ static char loaderror[256];
     #define LoadSDL20Library() ((Loaded_SDL20 = dlopen(SDL20_LIBNAME, RTLD_LOCAL|RTLD_NOW)) != NULL)
     #define LookupSDL20Sym(sym) dlsym(Loaded_SDL20, sym)
     #define CloseSDL20Library() { if (Loaded_SDL20) { dlclose(Loaded_SDL20); Loaded_SDL20 = NULL; } }
+#elif defined(NXDK)
+#elif defined(GEKKO)
+#elif defined(__WIIU__)
+#elif defined(__SWITCH__)
 #else
     #error Please define your platform.
 #endif
@@ -1215,6 +1255,7 @@ static char loaderror[256];
 #define DIRSEP "/"
 #endif
 
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
 static void *
 LoadSDL20Symbol(const char *fn, int *okay)
 {
@@ -1237,6 +1278,7 @@ UnloadSDL20(void)
     #include "SDL20_syms.h"
     CloseSDL20Library();
 }
+#endif
 
 typedef struct QuirkEntryType
 {
@@ -1467,6 +1509,8 @@ SDL12Compat_ApplyQuirks(SDL_bool force_x11)
     }
 }
 
+
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
 static int
 LoadSDL20(void)
 {
@@ -1548,6 +1592,7 @@ LoadSDL20(void)
     }
     return okay;
 }
+#endif
 
 #if defined(_WIN32)
 static void error_dialog(const char *errorMsg)
@@ -1563,7 +1608,7 @@ static void error_dialog(const char *errorMsg)
 }
 #endif
 
-#if defined(__GNUC__) && !defined(_WIN32)
+#if defined(__GNUC__) && !defined(_WIN32) && !defined(__SDL12_COMPAT_FULLY_STATIC__)
 static void dllinit(void) __attribute__((constructor));
 static void dllinit(void)
 {
@@ -1583,6 +1628,8 @@ static void dllquit(void)
 #define __FLTUSED__
 __declspec(selectany) int _fltused = 1;
 #endif
+
+#ifndef __SDL12_COMPAT_FULLY_STATIC__
 #if defined(__MINGW32__)
 #define _DllMainCRTStartup DllMainCRTStartup
 #endif
@@ -1615,6 +1662,7 @@ BOOL WINAPI _DllMainCRTStartup(HANDLE dllhandle, DWORD reason, LPVOID reserved)
     }
     return TRUE;
 }
+#endif
 
 #elif defined(__WATCOMC__) && defined(__OS2__)
 unsigned _System LibMain(unsigned hmod, unsigned termination)
@@ -1629,6 +1677,10 @@ unsigned _System LibMain(unsigned hmod, unsigned termination)
     return 1;
 }
 
+#elif defined(__SWITCH__)
+#elif defined(__WIIU__)
+#elif defined(GEKKO)
+#elif defined(NXDK)
 #else
     #error Please define an init procedure for your platform.
 #endif

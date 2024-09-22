@@ -26,8 +26,14 @@ real SDL-1.2 available to you. */
 #ifndef _begin_code_h
 #define _begin_code_h
 
+#ifndef __SDL12_COMPAT_STATIC__
 #ifdef __BUILDING_SDL12_COMPAT__
 #error You should not use these headers to build sdl12-compat. Use the real SDL2 headers instead.
+#endif
+#endif
+
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+#include "SDL_compat.h"
 #endif
 
 #ifdef __cplusplus

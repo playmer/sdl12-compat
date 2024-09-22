@@ -10,6 +10,7 @@ project(sdl12_compat
 option(SDL12TESTS "Enable to build SDL-1.2 test programs" ON)
 option(SDL12DEVEL "Enable installing SDL-1.2 development headers" ON)
 option(STATICDEVEL "Enable installing static link library" OFF)
+option(SDL12_FULLY_STATIC "Make SDL12_compat capable of being statically compiled alongside SDL2" OFF)
 
 if(STATICDEVEL AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
   message(FATAL_ERROR "Static builds are only supported on Linux.")
@@ -47,15 +48,29 @@ endif()
 
 set(SDL12COMPAT_SRCS
   src/SDL12_compat.c
+  src/SDL20_compat.c
   ${OSX_SRCS}
   ${WIN32_SRCS}
 )
-add_library(SDL SHARED ${SDL12COMPAT_SRCS})
 
-find_package(SDL2)
+
+
+if(NOT SDL2_INCLUDE_DIRS)
+  find_package(SDL2)
+endif()
+
 if(NOT SDL2_INCLUDE_DIRS)
   message(FATAL_ERROR "Could not find SDL2 headers")
 endif()
+
+if (SDL12_FULLY_STATIC)
+  add_library(SDL STATIC ${SDL12COMPAT_SRCS})
+  target_compile_definitions(SDL PUBLIC __SDL12_COMPAT_FULLY_STATIC__)
+  target_link_libraries(SDL PRIVATE ${SDL2_LIBRARY})
+else()
+  add_library(SDL SHARED ${SDL12COMPAT_SRCS})
+endif()
+
 target_include_directories(SDL PRIVATE ${SDL2_INCLUDE_DIRS})
 
 set(EXTRA_CFLAGS )
@@ -79,11 +94,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
 string(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
 
 if(UNIX AND NOT APPLE)
-    set_target_properties(SDL PROPERTIES COMPILE_DEFINITIONS "_REENTRANT")
+    target_compile_definitions(SDL PUBLIC _REENTRANT)
     target_link_libraries(SDL PRIVATE ${CMAKE_DL_LIBS})
 endif()
 if(APPLE)
-    set_target_properties(SDL PROPERTIES COMPILE_DEFINITIONS "_THREAD_SAFE")
+    target_compile_definitions(SDL PUBLIC _THREAD_SAFE)
     set_target_properties(SDL PROPERTIES LINK_FLAGS
             "-Wl,-compatibility_version,${DYLIB_COMPAT_VERSION} -Wl,-current_version,${DYLIB_CURRENT_VERSION}")
     target_link_libraries(SDL PRIVATE "-framework AppKit")
@@ -98,13 +113,13 @@ elseif(UNIX AND NOT ANDROID)
 elseif(WIN32)
     # avoid DLL having 'lib' prefix with MinGW
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
-    set_target_properties(SDL PROPERTIES COMPILE_DEFINITIONS "DLL_EXPORT")
+    target_compile_definitions(SDL PUBLIC DLL_EXPORT)
     set_target_properties(SDL PROPERTIES
         VERSION "${PROJECT_VERSION}"
         SOVERSION "0"
         OUTPUT_NAME "SDL")
 elseif(OS2)
-    set_target_properties(SDL PROPERTIES COMPILE_DEFINITIONS "BUILD_SDL") # for DECLSPEC
+    target_compile_definitions(SDL PUBLIC BUILD_SDL) # for DECLSPEC
     set_target_properties(SDL PROPERTIES
         VERSION "${PROJECT_VERSION}"
         SOVERSION "0"
@@ -147,7 +162,7 @@ if(APPLE)
     set_source_files_properties(src/SDLmain/macosx/SDLMain.m PROPERTIES LANGUAGE C)
 elseif(WIN32)
     add_library(SDLmain STATIC src/SDLmain/win32/SDL_win32_main.c)
-    set_target_properties(SDLmain PROPERTIES COMPILE_DEFINITIONS "_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE")  # !!! FIXME: don't use C runtime? We fixed this in SDL2.
+    target_compile_definitions(SDLmain PUBLIC _CRT_SECURE_NO_WARNINGS _CRT_SECURE_NO_DEPRECATE _CRT_NONSTDC_NO_DEPRECATE)  # !!! FIXME: don't use C runtime? We fixed this in SDL2.
 else()
     add_library(SDLmain STATIC src/SDLmain/dummy/SDL_dummy_main.c)
 endif()
@@ -180,12 +195,12 @@ if(SDL12TESTS)
         endif()
         # Turn off MSVC's aggressive C runtime warnings for the old test programs.
         if(MSVC)
-          set_target_properties(${_NAME} PROPERTIES COMPILE_DEFINITIONS "${HAVE_OPENGL_DEFINE};_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE")
+          target_compile_definitions(${_NAME} PUBLIC ${HAVE_OPENGL_DEFINE} _CRT_SECURE_NO_WARNINGS _CRT_SECURE_NO_DEPRECATE _CRT_NONSTDC_NO_DEPRECATE)
         elseif(APPLE)
-          set_target_properties(${_NAME} PROPERTIES COMPILE_DEFINITIONS "${HAVE_OPENGL_DEFINE};GL_SILENCE_DEPRECATION=1")
+          target_compile_definitions(${_NAME} PUBLIC ${HAVE_OPENGL_DEFINE} GL_SILENCE_DEPRECATION=1)
           target_link_libraries(${_NAME} "-Wl,-framework,Cocoa")
         else()
-          set_target_properties(${_NAME} PROPERTIES COMPILE_DEFINITIONS "${HAVE_OPENGL_DEFINE}")
+          target_compile_definitions(${_NAME} PUBLIC ${HAVE_OPENGL_DEFINE})
         endif()
         if(MATH_LIBRARY)
           target_link_libraries(${_NAME} ${MATH_LIBRARY})
@@ -306,7 +321,7 @@ endif()
 if(STATICDEVEL AND SDL12DEVEL)
   add_library(SDL-static STATIC ${SDL12COMPAT_SRCS})
   target_include_directories(SDL-static PRIVATE ${SDL2_INCLUDE_DIRS})
-  set_target_properties(SDL-static PROPERTIES COMPILE_DEFINITIONS "_REENTRANT")
+  target_compile_definitions(SDL-static PUBLIC "_REENTRANT")
   target_link_libraries(SDL-static PRIVATE ${CMAKE_DL_LIBS})
   set_target_properties(SDL-static PROPERTIES
           VERSION "${PROJECT_VERSION}"
