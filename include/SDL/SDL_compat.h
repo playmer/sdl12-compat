@@ -195,6 +195,14 @@
 #define SDL_GetWMInfo SDL_COMPAT_SDL_GetWMInfo
 #define SDL12COMPAT_GetWindow SDL_COMPAT_SDL12COMPAT_GetWindow
 
+#ifdef HAVE_PUTENV
+#else
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+  #define SDL_putenv SDL_COMPAT_SDL_putenv
+#else
+#endif
+#endif
+
 
 #define SDL_snprintf SDL_COMPAT_SDL_snprintf
 #define SDL_sscanf SDL_COMPAT_SDL_sscanf

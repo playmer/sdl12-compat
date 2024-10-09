@@ -259,7 +259,11 @@ SDL20_SYM(void,LockJoysticks,(void),(),)
 SDL20_SYM(void,UnlockJoysticks,(void),(),)
 
 SDL20_SYM(SDL_RWops *,RWFromFile,(const char *a, const char *b),(a,b),return)
+#ifdef HAVE_STDIO_H
+SDL20_SYM(SDL_RWops *,RWFromFP,(FILE *a, SDL_bool b),(a,b),return) /* FILE* */
+#else
 SDL20_SYM(SDL_RWops *,RWFromFP,(void *a, SDL_bool b),(a,b),return) /* FILE* */
+#endif
 SDL20_SYM(SDL_RWops *,RWFromMem,(void *a, int b),(a,b),return)
 SDL20_SYM(SDL_RWops *,RWFromConstMem,(const void *a, int b),(a,b),return)
 SDL20_SYM(SDL_RWops *,AllocRW,(void),(),return)

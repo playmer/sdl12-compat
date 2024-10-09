@@ -53,8 +53,6 @@ set(SDL12COMPAT_SRCS
   ${WIN32_SRCS}
 )
 
-
-
 if(NOT SDL2_INCLUDE_DIRS)
   find_package(SDL2)
 endif()
@@ -66,7 +64,7 @@ endif()
 if (SDL12_FULLY_STATIC)
   add_library(SDL STATIC ${SDL12COMPAT_SRCS})
   target_compile_definitions(SDL PUBLIC __SDL12_COMPAT_FULLY_STATIC__)
-  target_link_libraries(SDL PRIVATE ${SDL2_LIBRARY})
+  target_link_libraries(SDL PRIVATE ${SDL2_LIBRARIES})
 else()
   add_library(SDL SHARED ${SDL12COMPAT_SRCS})
 endif()

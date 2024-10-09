@@ -20,18 +20,6 @@
 */
 
 /* This file contains functions for backwards compatibility with SDL 1.2 */
-#ifdef __SDL12_COMPAT_FULLY_STATIC__
-//#ifdef NXDK
-//#define SDL_DISABLE_ANALYZE_MACROS
-//#undef _WIN32
-//#endif
-////#include "SDL.h"
-////#include "SDL_syswm.h"
-////#include "SDL20_compat_begin.h"
-//#include "../include/SDL/SDL_compat.h"
-#else
-#include "SDL20_include_wrapper.h"
-#endif
 
 /*
  * We report the library version as 1.2.$(SDL12_COMPAT_VERSION). This number
@@ -107,49 +95,14 @@ extern "C" {
 
 #define DECLSPEC12 DECLSPEC FORCEALIGNATTR
 
-/** Enable this to have warnings about wrong prototypes in SDL20_syms.h.
- *  It won't compile but it helps to make sure it's sync'ed with SDL2 headers.
- */
-#if 0
-#define SDL20_SYM(rc,fn,params,args,ret) \
-    typedef rc (SDLCALL *SDL20_##fn##_t) params; \
-    static SDL20_##fn##_t SDL20_##fn = IGNORE_THIS_VERSION_OF_SDL_##fn;
-#else
-
-#ifndef __SDL12_COMPAT_FULLY_STATIC__
-#define SDL20_SYM(rc,fn,params,args,ret) \
-    typedef rc (SDLCALL *SDL20_##fn##_t) params; \
-    static SDL20_##fn##_t SDL20_##fn = NULL;
-
-#include "SDL20_syms.h"
-#endif
-
-/* Things that _should_ be binary compatible pass right through... */
-
-#ifndef __SDL12_COMPAT_FULLY_STATIC__
-#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
-    DECLSPEC12 rc SDLCALL SDL_##fn params { ret SDL20_##fn args; }
-#include "SDL20_syms.h"
-#else
-//#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
-//    DECLSPEC12 rc SDLCALL SDL_COMPAT_SDL_##fn params { ret SDL20_##fn args; }
-//#include "SDL20_syms.h"
-
-#define SDL_malloc SDL_COMPAT_SDL_malloc
-#define SDL_free SDL_COMPAT_SDL_free
-#define SDL_strdup SDL_COMPAT_SDL_strdup
-#define SDL_strtoull SDL_COMPAT_SDL_strtoull
-#define SDL_putenv SDL_COMPAT_SDL_putenv
-#endif
-#endif
-
-#ifdef __SDL12_COMPAT_FULLY_STATIC__
-#include "SDL20.h"
-
 #ifdef NXDK
 #define SDL_DISABLE_ANALYZE_MACROS
 #undef _WIN32
 #endif
+
+#include "SDL20.h"
+
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
 #include "../include/SDL/SDL_compat.h"
 #endif
 
@@ -1511,87 +1464,7 @@ SDL12Compat_ApplyQuirks(SDL_bool force_x11)
 
 
 #ifndef __SDL12_COMPAT_FULLY_STATIC__
-static int
-LoadSDL20(void)
-{
-    int okay = 1;
-    if (!Loaded_SDL20) {
-        SDL_bool force_x11 = SDL_FALSE;
-
-        #ifdef __linux__
-        void *global_symbols = dlopen(NULL, RTLD_LOCAL|RTLD_NOW);
-
-        /* Use linked libraries to detect what quirks we are likely to need */
-        if (global_symbols != NULL) {
-            if (dlsym(global_symbols, "glxewInit") != NULL) {  /* GLEW (e.g. Frogatto, SLUDGE) */
-                force_x11 = SDL_TRUE;
-            } else if (dlsym(global_symbols, "cgGLEnableProgramProfiles") != NULL) {  /* NVIDIA Cg (e.g. Awesomenauts, Braid) */
-                force_x11 = SDL_TRUE;
-            } else if (dlsym(global_symbols, "_Z7ssgInitv") != NULL) {  /* ::ssgInit(void) in plib (e.g. crrcsim) */
-                force_x11 = SDL_TRUE;
-            }
-            dlclose(global_symbols);
-        }
-        #endif
-
-        okay = LoadSDL20Library();
-        if (!okay) {
-            SDL12COMPAT_stpcpy(loaderror, "Failed loading SDL2 library.");
-        } else {
-            #define SDL20_SYM(rc,fn,params,args,ret) SDL20_##fn = (SDL20_##fn##_t) LoadSDL20Symbol("SDL_" #fn, &okay);
-            #include "SDL20_syms.h"
-            if (okay) {
-                SDL_version v;
-                SDL20_GetVersion(&v);
-                LinkedSDL2VersionInt = SDL_VERSIONNUM(v.major, v.minor, v.patch);
-                okay = (LinkedSDL2VersionInt >= SDL20_REQUIRED_VER);
-                if (!okay) {
-                    char value[12];
-                    char *p = SDL12COMPAT_stpcpy(loaderror, "SDL2 ");
-
-                    SDL12COMPAT_itoa(value, v.major);
-                    p = SDL12COMPAT_stpcpy(p, value); *p++ = '.';
-                    SDL12COMPAT_itoa(value, v.minor);
-                    p = SDL12COMPAT_stpcpy(p, value); *p++ = '.';
-                    SDL12COMPAT_itoa(value, v.patch);
-                    p = SDL12COMPAT_stpcpy(p, value);
-
-                    SDL12COMPAT_stpcpy(p, " library is too old.");
-                } else {
-                    WantDebugLogging = SDL12Compat_GetHintBoolean("SDL12COMPAT_DEBUG_LOGGING", SDL_FALSE);
-                    if (WantDebugLogging) {
-                        #if defined(__DATE__) && defined(__TIME__)
-                        SDL20_Log("sdl12-compat 1.2.%d, built on " __DATE__ " at " __TIME__ ", talking to SDL2 %d.%d.%d", SDL12_COMPAT_VERSION, v.major, v.minor, v.patch);
-                        #else
-                        SDL20_Log("sdl12-compat 1.2.%d, talking to SDL2 %d.%d.%d", SDL12_COMPAT_VERSION, v.major, v.minor, v.patch);
-                        #endif
-                    }
-                    SDL12Compat_ApplyQuirks(force_x11);  /* Apply and maybe print a list of any enabled quirks. */
-
-                    #ifdef __linux__
-                    {
-                        const char *viddrv = SDL20_getenv("SDL_VIDEODRIVER");
-                        if (viddrv && (SDL20_strcmp(viddrv, "x11") == 0) && SDL12Compat_GetHintBoolean("SDL12COMPAT_FORCE_XINITTHREADS", SDL_TRUE)) {
-                            void *lib = dlopen("libX11.so.6", RTLD_GLOBAL|RTLD_NOW);
-                            if (lib) {
-                                int (*pXInitThreads)(void) = (int(*)(void)) dlsym(lib, "XInitThreads");
-                                if (pXInitThreads) {
-                                    pXInitThreads();
-                                }
-                                /* leave the library open, so the XInitThreads sticks. */
-                            }
-                        }
-                    }
-                    #endif
-                }
-            }
-            if (!okay) {
-                UnloadSDL20();
-            }
-        }
-    }
-    return okay;
-}
+static int LoadSDL20(void);
 #endif
 
 #if defined(_WIN32)
@@ -1600,6 +1473,8 @@ static void error_dialog(const char *errorMsg)
     MessageBoxA(NULL, errorMsg, "Error", MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
 }
 #elif defined(__APPLE__)
+extern void error_dialog(const char *errorMsg);
+#elif defined(NXDK)
 extern void error_dialog(const char *errorMsg);
 #else
 static void error_dialog(const char *errorMsg)
@@ -5704,7 +5579,7 @@ EndVidModeCreate(void)
     overlay = QueuedDisplayOverlays.next;
     while (overlay != NULL) {
         QueuedOverlayItem *next = overlay->next;
-        SDL_free(overlay);
+        SDL20_free(overlay);
         overlay = next;
     }
     QueuedDisplayOverlays.next = NULL;
@@ -6244,7 +6119,7 @@ SetVideoModeImpl(int width, int height, int bpp, Uint32 flags12)
 
     if (fromwin_env) {
         char *endp = NULL;
-        const Uint64 windowid = SDL_strtoull(fromwin_env, &endp, 0);
+        const Uint64 windowid = SDL20_strtoull(fromwin_env, &endp, 0);
         if ((*fromwin_env == '\0') || (*endp != '\0')) {
             SDL20_SetError("Invalid SDL_WINDOWID");
             return EndVidModeCreate();
@@ -6875,7 +6750,7 @@ PresentScreen(void)
                 SDL_Rect dstrect20;
                 SDL20_RenderCopy(renderer, hwdata->texture20, NULL, Rect12to20(&overlay->dstrect12, &dstrect20));
             }
-            SDL_free(overlay);
+            SDL20_free(overlay);
             overlay = next;
         }
         QueuedDisplayOverlays.next = NULL;
@@ -7775,7 +7650,7 @@ SDL_DisplayYUVOverlay(SDL12_Overlay *overlay12, SDL12_Rect *dstrect12)
         }
     }
 
-    if ((overlay = (QueuedOverlayItem *) SDL_malloc(sizeof (QueuedOverlayItem))) == NULL) {
+    if ((overlay = (QueuedOverlayItem *) SDL20_malloc(sizeof (QueuedOverlayItem))) == NULL) {
         UnlockVideoRenderer();
         return SDL20_OutOfMemory();
     }
@@ -8636,7 +8511,7 @@ SDL_LoadWAV_RW(SDL12_RWops *rwops12, int freerwops12,
             if (memrwops20) {
                 retval = SDL20_LoadWAV_RW(memrwops20, 1, spec, buf, len);
             }
-            SDL_free(buffer);
+            SDL20_free(buffer);
         }
     }
 
@@ -8783,7 +8658,7 @@ InitializeCDSubsystem(void)
 
     cdpath = SDL12Compat_GetHint("SDL12COMPAT_FAKE_CDROM_PATH");
     if (cdpath) {
-        CDRomPath = SDL_strdup(cdpath);
+        CDRomPath = SDL20_strdup(cdpath);
     }
 
     CDRomInit = SDL_TRUE;
@@ -8795,7 +8670,7 @@ QuitCDSubsystem(void)
     if (!CDRomInit) {
         return;
     }
-    SDL_free(CDRomPath);
+    SDL20_free(CDRomPath);
     CDRomPath = NULL;
     CDRomInit = SDL_FALSE;
 }
@@ -9031,7 +8906,7 @@ LoadCDTrack(const int tracknum, drmp3 *mp3)
     const SDL_AudioSpec *have = &audio_cbdata->device_format;
     SDL_RWops *rw = NULL;
     const size_t alloclen = SDL20_strlen(CDRomPath) + 32;
-    char *fullpath = (char *) SDL_malloc(alloclen);
+    char *fullpath = (char *) SDL20_malloc(alloclen);
     const int c = tracknum + 1;
     char c0, c1;
 
@@ -9493,7 +9368,7 @@ OpenSDL2AudioDevice(SDL_AudioSpec *appwant)
     }
 
     if (SDL20_OpenAudio(&devwant, &audio_cbdata->device_format) == -1) {
-        SDL_free(audio_cbdata);
+        SDL20_free(audio_cbdata);
         audio_cbdata = NULL;
         return SDL_FALSE;
     }
@@ -9967,5 +9842,369 @@ X11_KeyToUnicode(SDL12Key key, SDL12Mod mod)
 #ifdef __cplusplus
 }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+/* on x86 Linux builds, we have the public entry points force stack alignment to 16 bytes
+   on entry. This won't be a massive performance hit, but it might help extremely old
+   binaries that want to call into SDL to not crash in hard-to-diagnose ways. It's not a
+   panacea to the stack alignment problem, but it might help a little.
+
+   The force_align_arg_pointer attribute requires gcc >= 4.2.x. */
+#if defined(__clang__)
+#define HAVE_FORCE_ALIGN_ARG_POINTER
+#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#define HAVE_FORCE_ALIGN_ARG_POINTER
+#endif
+#if defined(__linux__) && defined(__i386__) && defined(HAVE_FORCE_ALIGN_ARG_POINTER)
+#define FORCEALIGNATTR __attribute__((force_align_arg_pointer))
+#else
+#define FORCEALIGNATTR
+#endif
+
+/* Statically load functions */
+#ifdef __SDL12_COMPAT_FULLY_STATIC__
+
+#define DECLSPEC12 DECLSPEC FORCEALIGNATTR
+
+
+
+#undef SDL_iconv
+#undef SDL_iconv_string
+#undef SDL_main
+#undef SDL_SetModuleHandle
+#undef SDL_RegisterApp
+#undef SDL_UnregisterApp
+#undef SDL_SetError
+#undef SDL_GetError
+#undef SDL_ClearError
+#undef SDL_Error
+#undef SDL_CreateMutex
+#undef SDL_mutexP
+#undef SDL_mutexV
+#undef SDL_DestroyMutex
+#undef SDL_CreateSemaphore
+#undef SDL_SemPost
+#undef SDL_SemWait
+#undef SDL_SemWaitTimeout
+#undef SDL_SemTryWait
+#undef SDL_SemValue
+#undef SDL_DestroySemaphore
+#undef SDL_CreateCond
+#undef SDL_CondSignal
+#undef SDL_CondBroadcast
+#undef SDL_CondWait
+#undef SDL_CondWaitTimeout
+#undef SDL_DestroyCond
+#undef SDL_CreateThread
+#undef SDL_ThreadID
+#undef SDL_GetThreadID
+#undef SDL_WaitThread
+#undef SDL_KillThread
+#undef SDL_RWFromFP
+#undef SDL_RWFromFile
+#undef SDL_RWFromMem
+#undef SDL_RWFromConstMem
+#undef SDL_AllocRW
+#undef SDL_FreeRW
+#undef SDL_ReadLE16
+#undef SDL_ReadBE16
+#undef SDL_ReadLE32
+#undef SDL_ReadBE32
+#undef SDL_ReadLE64
+#undef SDL_ReadBE64
+#undef SDL_WriteLE16
+#undef SDL_WriteBE16
+#undef SDL_WriteLE32
+#undef SDL_WriteBE32
+#undef SDL_WriteLE64
+#undef SDL_WriteBE64
+#undef SDL_AudioInit
+#undef SDL_AudioQuit
+#undef SDL_AudioDriverName
+#undef SDL_OpenAudio
+#undef SDL_PauseAudio
+#undef SDL_CloseAudio
+#undef SDL_GetAudioStatus
+#undef SDL_LockAudio
+#undef SDL_UnlockAudio
+#undef SDL_LoadWAV_RW
+#undef SDL_FreeWAV
+#undef SDL_BuildAudioCVT
+#undef SDL_ConvertAudio
+#undef SDL_MixAudio
+#undef SDL_CDNumDrives
+#undef SDL_CDName
+#undef SDL_CDOpen
+#undef SDL_CDStatus
+#undef SDL_CDPlayTracks
+#undef SDL_CDPlay
+#undef SDL_CDPause
+#undef SDL_CDResume
+#undef SDL_CDStop
+#undef SDL_CDEject
+#undef SDL_CDClose
+#undef SDL_HasRDTSC
+#undef SDL_HasMMX
+#undef SDL_HasMMXExt
+#undef SDL_Has3DNow
+#undef SDL_Has3DNowExt
+#undef SDL_HasSSE
+#undef SDL_HasSSE2
+#undef SDL_HasAltiVec
+#undef SDL_GetAppState
+#undef SDL_GetKeyState
+#undef SDL_GetModState
+#undef SDL_SetModState
+#undef SDL_GetKeyName
+#undef SDL_EnableKeyRepeat
+#undef SDL_GetKeyRepeat
+#undef SDL_EnableUNICODE
+#undef SDL_VideoInit
+#undef SDL_VideoQuit
+#undef SDL_VideoDriverName
+#undef SDL_GetVideoSurface
+#undef SDL_GetVideoInfo
+#undef SDL_VideoModeOK
+#undef SDL_ListModes
+#undef SDL_SetVideoMode
+#undef SDL_UpdateRects
+#undef SDL_UpdateRect
+#undef SDL_Flip
+#undef SDL_SetGamma
+#undef SDL_SetGammaRamp
+#undef SDL_GetGammaRamp
+#undef SDL_SetColors
+#undef SDL_SetPalette
+#undef SDL_MapRGB
+#undef SDL_MapRGBA
+#undef SDL_GetRGB
+#undef SDL_GetRGBA
+#undef SDL_CreateRGBSurface
+#undef SDL_CreateRGBSurfaceFrom
+#undef SDL_FreeSurface
+#undef SDL_LockSurface
+#undef SDL_UnlockSurface
+#undef SDL_LoadBMP_RW
+#undef SDL_SaveBMP_RW
+#undef SDL_SetColorKey
+#undef SDL_SetAlpha
+#undef SDL_SetClipRect
+#undef SDL_GetClipRect
+#undef SDL_ConvertSurface
+#undef SDL_UpperBlit
+#undef SDL_LowerBlit
+#undef SDL_FillRect
+#undef SDL_DisplayFormat
+#undef SDL_DisplayFormatAlpha
+#undef SDL_CreateYUVOverlay
+#undef SDL_LockYUVOverlay
+#undef SDL_UnlockYUVOverlay
+#undef SDL_DisplayYUVOverlay
+#undef SDL_FreeYUVOverlay
+#undef SDL_GL_LoadLibrary
+#undef SDL_GL_GetProcAddress
+#undef SDL_GL_SetAttribute
+#undef SDL_GL_GetAttribute
+#undef SDL_GL_SwapBuffers
+#undef SDL_GL_UpdateRects
+#undef SDL_GL_Lock
+#undef SDL_GL_Unlock
+#undef SDL_WM_SetCaption
+#undef SDL_WM_GetCaption
+#undef SDL_WM_SetIcon
+#undef SDL_WM_IconifyWindow
+#undef SDL_WM_ToggleFullScreen
+#undef SDL_WM_GrabInput
+#undef SDL_SoftStretch
+#undef SDL_GetMouseState
+#undef SDL_GetRelativeMouseState
+#undef SDL_WarpMouse
+#undef SDL_CreateCursor
+#undef SDL_SetCursor
+#undef SDL_GetCursor
+#undef SDL_FreeCursor
+#undef SDL_ShowCursor
+#undef SDL_NumJoysticks
+#undef SDL_JoystickName
+#undef SDL_JoystickOpen
+#undef SDL_JoystickOpened
+#undef SDL_JoystickIndex
+#undef SDL_JoystickNumAxes
+#undef SDL_JoystickNumBalls
+#undef SDL_JoystickNumHats
+#undef SDL_JoystickNumButtons
+#undef SDL_JoystickUpdate
+#undef SDL_JoystickEventState
+#undef SDL_JoystickGetAxis
+#undef SDL_JoystickGetHat
+#undef SDL_JoystickGetBall
+#undef SDL_JoystickGetButton
+#undef SDL_JoystickClose
+#undef SDL_PumpEvents
+#undef SDL_PeepEvents
+#undef SDL_PollEvent
+#undef SDL_WaitEvent
+#undef SDL_PushEvent
+#undef SDL_SetEventFilter
+#undef SDL_GetEventFilter
+#undef SDL_EventState
+#undef SDL_LoadObject
+#undef SDL_LoadFunction
+#undef SDL_UnloadObject
+#undef SDL_GetTicks
+#undef SDL_Delay
+#undef SDL_SetTimer
+#undef SDL_AddTimer
+#undef SDL_RemoveTimer
+#undef SDL_Linked_Version
+#undef SDL_Init
+#undef SDL_InitSubSystem
+#undef SDL_QuitSubSystem
+#undef SDL_WasInit
+#undef SDL_Quit
+#undef SDL_GetWMInfo
+#undef SDL12COMPAT_GetWindow
+
+// Symbols we reimplemented above as a macro
+#undef SDL_ReportAssertion
+
+#define SDL20_SYM(rc,fn,params,args,ret) \
+    rc SDLCALL SDL_##fn params; \
+    rc (SDLCALL *SDL20_##fn) params = SDL_##fn;
+
+#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
+    rc SDLCALL SDL_##fn params; \
+    rc (SDLCALL *SDL20_##fn) params = SDL_##fn; \
+    DECLSPEC12 rc SDLCALL SDL_COMPAT_SDL_##fn params { ret SDL20_##fn args; }
+
+#include "SDL20_syms.h"
+
+#undef SDL20_SYM
+#undef SDL20_SYM_PASSTHROUGH
+
+/* Dynamically load functions */
+#else
+
+#include "SDL20_include_wrapper.h"
+
+#define SDL20_SYM(rc,fn,params,args,ret) \
+    rc (SDLCALL *SDL20_##fn) params = NULL;
+
+#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
+    rc (SDLCALL *SDL20_##fn) params = NULL; \
+    DECLSPEC12 rc SDLCALL SDL_##fn params { ret SDL20_##fn args; }
+
+#include "SDL20_syms.h"
+
+static int
+LoadSDL20(void)
+{
+    int okay = 1;
+    if (!Loaded_SDL20) {
+        SDL_bool force_x11 = SDL_FALSE;
+
+        #ifdef __linux__
+        void *global_symbols = dlopen(NULL, RTLD_LOCAL|RTLD_NOW);
+
+        /* Use linked libraries to detect what quirks we are likely to need */
+        if (global_symbols != NULL) {
+            if (dlsym(global_symbols, "glxewInit") != NULL) {  /* GLEW (e.g. Frogatto, SLUDGE) */
+                force_x11 = SDL_TRUE;
+            } else if (dlsym(global_symbols, "cgGLEnableProgramProfiles") != NULL) {  /* NVIDIA Cg (e.g. Awesomenauts, Braid) */
+                force_x11 = SDL_TRUE;
+            } else if (dlsym(global_symbols, "_Z7ssgInitv") != NULL) {  /* ::ssgInit(void) in plib (e.g. crrcsim) */
+                force_x11 = SDL_TRUE;
+            }
+            dlclose(global_symbols);
+        }
+        #endif
+
+        okay = LoadSDL20Library();
+        if (!okay) {
+            SDL12COMPAT_stpcpy(loaderror, "Failed loading SDL2 library.");
+        } else {
+            #define SDL20_SYM(rc,fn,params,args,ret) SDL20_##fn = (rc (SDLCALL *) params)LoadSDL20Symbol("SDL_" #fn, &okay);
+            #define SDL20_SYM(rc,fn,params,args,ret) SDL20_##fn = (rc (SDLCALL *) params)LoadSDL20Symbol("SDL_" #fn, &okay);
+
+            #include "SDL20_syms.h"
+            if (okay) {
+                SDL_version v;
+                SDL20_GetVersion(&v);
+                LinkedSDL2VersionInt = SDL_VERSIONNUM(v.major, v.minor, v.patch);
+                okay = (LinkedSDL2VersionInt >= SDL20_REQUIRED_VER);
+                if (!okay) {
+                    char value[12];
+                    char *p = SDL12COMPAT_stpcpy(loaderror, "SDL2 ");
+
+                    SDL12COMPAT_itoa(value, v.major);
+                    p = SDL12COMPAT_stpcpy(p, value); *p++ = '.';
+                    SDL12COMPAT_itoa(value, v.minor);
+                    p = SDL12COMPAT_stpcpy(p, value); *p++ = '.';
+                    SDL12COMPAT_itoa(value, v.patch);
+                    p = SDL12COMPAT_stpcpy(p, value);
+
+                    SDL12COMPAT_stpcpy(p, " library is too old.");
+                } else {
+                    WantDebugLogging = SDL12Compat_GetHintBoolean("SDL12COMPAT_DEBUG_LOGGING", SDL_FALSE);
+                    if (WantDebugLogging) {
+                        #if defined(__DATE__) && defined(__TIME__)
+                        SDL20_Log("sdl12-compat 1.2.%d, built on " __DATE__ " at " __TIME__ ", talking to SDL2 %d.%d.%d", SDL12_COMPAT_VERSION, v.major, v.minor, v.patch);
+                        #else
+                        SDL20_Log("sdl12-compat 1.2.%d, talking to SDL2 %d.%d.%d", SDL12_COMPAT_VERSION, v.major, v.minor, v.patch);
+                        #endif
+                    }
+                    SDL12Compat_ApplyQuirks(force_x11);  /* Apply and maybe print a list of any enabled quirks. */
+
+                    #ifdef __linux__
+                    {
+                        const char *viddrv = SDL20_getenv("SDL_VIDEODRIVER");
+                        if (viddrv && (SDL20_strcmp(viddrv, "x11") == 0) && SDL12Compat_GetHintBoolean("SDL12COMPAT_FORCE_XINITTHREADS", SDL_TRUE)) {
+                            void *lib = dlopen("libX11.so.6", RTLD_GLOBAL|RTLD_NOW);
+                            if (lib) {
+                                int (*pXInitThreads)(void) = (int(*)(void)) dlsym(lib, "XInitThreads");
+                                if (pXInitThreads) {
+                                    pXInitThreads();
+                                }
+                                /* leave the library open, so the XInitThreads sticks. */
+                            }
+                        }
+                    }
+                    #endif
+                }
+            }
+            if (!okay) {
+                UnloadSDL20();
+            }
+        }
+    }
+    return okay;
+}
+
+
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* vi: set ts=4 sw=4 expandtab: */

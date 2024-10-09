@@ -9,6 +9,9 @@
 #define SDL20_SYM(rc,fn,params,args,ret) \
     extern rc (SDLCALL *SDL20_##fn) params;
 
+#define SDL20_SYM_PASSTHROUGH(rc,fn,params,args,ret) \
+    extern rc (SDLCALL *SDL20_##fn) params;
+
 #include "SDL20_syms.h"
 
 
