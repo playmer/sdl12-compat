@@ -9,7 +9,8 @@ jobs:
     strategy:
       matrix:
         platform:
-        - { name: Windows, os: windows-latest }
+        - { name: Windows-x86, os: windows-latest, flags: -A Win32 }
+        - { name: Windows-x86_64, os: windows-latest, flags: -A x64 }
         - { name: Linux-x86_64, os: ubuntu-24.04, flags: -GNinja }
         - { name: Linux-arm64, os: ubuntu-24.04-arm, flags: -GNinja }
         - { name: MacOS-arm, os: macos-latest }
